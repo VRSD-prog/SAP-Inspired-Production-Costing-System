@@ -1,0 +1,216 @@
+/* -------------------------- */
+/* Main Container */
+/* -------------------------- */
+body {
+    display: flex;
+    flex-direction: row;
+    padding: 50px;
+    gap: 50px;
+    margin-left: 50px;
+    margin-top: 50px;
+    font-family: 'Roboto', sans-serif;
+    border-style: solid;
+    border-color: var(--border);
+    border-width: var(--border-width);
+}
+
+:root {
+    --border: rgb(166, 166, 166);
+    --border-width: 1px;
+    --blue: #4381d5;
+}
+
+/* -------------------------- */
+/* Navigation Tabs */
+/* -------------------------- */
+ul.navigation_tabs {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-style: solid;
+    border-color: rgb(211, 211, 211);
+    border-width: var(--border-width);
+    height: 520px;
+    padding: 20px;
+}
+
+[data-tab-content] {
+    display: none;
+}
+
+[data-tab-target] {
+    border-style: solid;
+    border-color: var(--border);
+    border-width: var(--border-width);
+    border-radius: 10px;
+    padding: 13px;
+    text-align: center;
+}
+
+.active[data-tab-content] {
+    display: grid;
+}
+
+#profitability.active[data-tab-content], 
+#client_invoices.active[data-tab-content] {
+    display: block;
+}
+
+[data-item-content] {
+    display: none;
+}
+
+.active[data-item-content] {
+    display: block;
+}
+
+[data-item-target] {
+    background-color: white;
+}
+
+.active[data-item-target] {
+    background-color: rgb(238, 238, 238);
+}
+
+/* -------------------------- */
+/* Reusable Components */
+/* -------------------------- */
+button {
+    padding: 0;
+    margin: 0;
+    width: 150px;
+    height: 40px;
+    border-radius: 10px;
+    border: none;
+    background-color: var(--blue);
+    font-weight: 700;
+    font-family: 'Roboto', sans-serif;
+    color: white;
+}
+
+tr {
+    height: 30px;
+}
+
+.currency::before {
+    content: "Php";
+    margin-right: 4px;
+}
+
+.time::after {
+    content: "hrs";
+    margin-left: 4px;
+}
+
+/* -------------------------- */
+/* Cost Centers Feature */
+/* -------------------------- */
+#cost_centers.active, #production_orders.active {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 20px;
+}
+
+#cost_center_list,
+#production_order_list {
+    border-radius: 0px;
+    border-style: solid;
+    border-color: var(--border);
+    border-width: var(--border-width);
+    height: fit-content;
+    min-height: 450px;
+    width: 280px;
+}
+
+    .cost_center,
+    .production_order {
+        display: grid;
+        grid-template-columns: 7fr 1fr 1fr;
+        align-items: center;
+        padding: 15px;
+        border-bottom-style: solid;
+        border-color: var(--border);
+        border-width: var(--border-width);
+    }
+
+        .edit_button, 
+        .activity_type_edit_button, 
+        .order_edit_button {
+            grid-column: 2 / 3;
+        }
+
+        .edit_button img, 
+        .activity_type_edit_button img,  
+        .activity_type_delete_button img, 
+        .order_activity_type_edit_button img,  
+        .order_activity_type_delete_button img,
+        .order_edit_button img, 
+        .order_delete_button img {
+            height: 25px;
+        }
+
+        .delete_button {
+            grid-column: 3 / 4;
+        }
+
+        .delete_button img {
+            height: 25px;
+        }
+
+#cost_center_info {
+    border-radius: 0px;
+    height: fit-content;
+    min-height: 400px;
+    width: 440px;
+}
+
+#order_info {
+    border-radius: 0px;
+    height: fit-content;
+    min-height: 400px;
+    width: 600px;
+}
+
+    #cost_center_title, 
+    #order_title {
+        display: block;
+        height: 40px;
+        border-style: solid;
+        border-color: var(--border);
+        border-width: var(--border-width);
+    }
+
+    #activity_type_box,
+    #order_activity_type_box {
+        display: block;
+        min-height: 177px;
+        border-style: solid;
+        border-color: var(--border);
+        border-width: var(--border-width);
+        padding: 10px;
+        padding-top: 5px;
+        padding-right: 0px;
+    }
+
+        .activity_number,
+        .order_activity_number {
+            text-align: right;
+        }
+
+.invoice {
+    display: flex;
+    gap: 100px;
+    border-style: solid;
+    padding: 20px;
+    min-width: 500px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.invoice .delete_button {
+    position: relative;
+    margin-left: auto;
+}
