@@ -174,20 +174,28 @@ function addCostCenterButtonFunctionality() {
                 const activityTypeText = activityType.querySelector(".activity_type_name") // Select name cell
                 const activityTypeCost = activityType.querySelector(".activity_type_total_cost") // Select total cost cell
                 const activityTypeCapacity = activityType.querySelector(".activity_type_capacity") // Select total capacity cell
-                activityTypeText.textContent = newActivityTypeName // Add prompt entry as text to the name cell
-                activityTypeCost.textContent = newActivityTypeCost // Add prompt entry as text to the total cost cell
-                activityTypeCapacity.textContent = newActivityTypeCapacity // Add prompt entry as text to the capacity cell
-            
-                const currencySpan = document.createElement('span') // Create a span for the currency
-                currencySpan.classList.add('currency') // Add the currency class
-                activityTypeCost.prepend(currencySpan) // Append the currency span to the cost cell
-            
-                const timeSpan = document.createElement('span') // Create a span for the time
-                timeSpan.classList.add('time') // Add the time class
-                activityTypeCapacity.appendChild(timeSpan) // Append the time span to the capacity cell
+                
+                // Update name
+                activityTypeText.textContent = newActivityTypeName
+                
+                // Update cost - maintain span structure
+                let costSpan = activityTypeCost.querySelector('.currency')
+                if (!costSpan) {
+                    activityTypeCost.innerHTML = '<span class="currency"></span>'
+                    costSpan = activityTypeCost.querySelector('.currency')
+                }
+                costSpan.textContent = newActivityTypeCost
+                
+                // Update capacity - maintain span structure
+                let capacitySpan = activityTypeCapacity.querySelector('.time')
+                if (!capacitySpan) {
+                    activityTypeCapacity.innerHTML = '<span class="time"></span>'
+                    capacitySpan = activityTypeCapacity.querySelector('.time')
+                }
+                capacitySpan.textContent = newActivityTypeCapacity
 
                 updateCostCenterCost() // Update Cost Center Cost
-                updateOrderCost() // Update Order Cost
+                updateOrderCost() // Update Order Cost AND sync names
             })
         }
     })
@@ -450,8 +458,8 @@ function addProductionOrderButtonFunctionality() {
                 orderActivityTypeName.textContent = selectedActivity.name // Add activity name
                 orderActivityTypeDuration.innerHTML = `<span class="time">${newDuration}</span>` // Add duration
                 orderActivityTypeActualDuration.innerHTML = `<span class="time">${newActualDuration}</span>` // Add actual duration
-                orderActivityTypeCost.innerHTML = `<span class="currency">Php ${cost.toFixed(2)}</span>` // Add cost, round to 2 decimal places
-                orderActivityTypeActualCost.innerHTML = `<span class="currency">Php ${actualCost.toFixed(2)}</span>` // Add actual cost, round to 2 decimal places
+                orderActivityTypeCost.innerHTML = `<span class="currency">${cost.toFixed(2)}</span>` // Add cost (no manual "Php")
+                orderActivityTypeActualCost.innerHTML = `<span class="currency">${actualCost.toFixed(2)}</span>` // Add actual cost (no manual "Php")
                 
                 // Store reference
                 const rowId = `order_activity_row_${Date.now()}_${Math.random()}` // Create row ID using current date and random number
@@ -599,10 +607,10 @@ addOrderActivityTypeButton.addEventListener("click", () => { // Add a click even
     orderActivityTypeActualDuration.textContent = actualDurationText // Attach actual duration from prompt
 
     const orderActivityTypeCost = row.querySelector(".order_activity_type_cost .currency") // Select the order activity type cost cell
-    orderActivityTypeCost.textContent = `Php ${cost.toFixed(2)}` // Calculate and attach cost
+    orderActivityTypeCost.textContent = cost.toFixed(2) // Calculate and attach cost (no manual "Php")
 
     const orderActivityTypeActualCost = row.querySelector(".order_activity_type_actual_cost .currency") // Select the order activity type actual cost cell
-    orderActivityTypeActualCost.textContent = `Php ${actualCost.toFixed(2)}` // Calculate and attach actual cost
+    orderActivityTypeActualCost.textContent = actualCost.toFixed(2) // Calculate and attach actual cost (no manual "Php")
 
     activeOrderActivityTypeList.appendChild(row) // Append to Order Activity Type List
 
@@ -625,23 +633,38 @@ function updateOrderCost() {
         const row = document.querySelector(`[data-row-id="${rowId}"]`) // Select row based on data-row-id value
         
         if (row && ref.activityElement) {
-            const costText = ref.activityElement.querySelector(".activity_type_total_cost .currency").textContent // Select the cost text
-            const capacityText = ref.activityElement.querySelector(".activity_type_capacity .time").textContent // Select the capacity text
-            const rate = parseFloat(costText) / parseFloat(capacityText) // Calculate the rate by dividing the cost with the capacity
+            // Get the current name from the source activity
+            const currentName = ref.activityElement.querySelector(".activity_type_name").textContent
             
-            const cost = rate * ref.duration // Calculate the order cost by multiplying the rate with the duration
-            const actualCost = rate * ref.actualDuration // Calculate the actual order cost by multiplying the rate with the actual duration
+            // Update the name in the order activity type
+            const nameCell = row.querySelector(".order_activity_type_name")
+            if (nameCell) {
+                nameCell.textContent = currentName
+            }
             
-            const costCell = row.querySelector(".order_activity_type_cost .currency") // Select the cost cell
-            const actualCostCell = row.querySelector(".order_activity_type_actual_cost .currency") // Select the actual cost cell
+            // Get cost and capacity with proper parsing
+            const costSpan = ref.activityElement.querySelector(".activity_type_total_cost .currency")
+            const capacitySpan = ref.activityElement.querySelector(".activity_type_capacity .time")
             
-            if (costCell) {
-                costCell.textContent = `Php ${cost.toFixed(2)}` // Attach the cost to the cost cell, rounded to 2 decimal places
-            } 
+            if (costSpan && capacitySpan) {
+                const costText = costSpan.textContent.trim()
+                const capacityText = capacitySpan.textContent.trim()
+                const rate = parseFloat(costText) / parseFloat(capacityText) // Calculate the rate by dividing the cost with the capacity
+                
+                const cost = rate * ref.duration // Calculate the order cost by multiplying the rate with the duration
+                const actualCost = rate * ref.actualDuration // Calculate the actual order cost by multiplying the rate with the actual duration
+                
+                const costCell = row.querySelector(".order_activity_type_cost .currency") // Select the cost cell
+                const actualCostCell = row.querySelector(".order_activity_type_actual_cost .currency") // Select the actual cost cell
+                
+                if (costCell) {
+                    costCell.textContent = cost.toFixed(2) // Attach the cost (no manual "Php")
+                } 
 
-            if (actualCostCell) {
-                actualCostCell.textContent = `Php ${actualCost.toFixed(2)}` // Attach the actual cost to the actual cost cell, rounded to 2 decimal place
-            } 
+                if (actualCostCell) {
+                    actualCostCell.textContent = actualCost.toFixed(2) // Attach the actual cost (no manual "Php")
+                } 
+            }
         }
     })
     
@@ -653,13 +676,13 @@ function updateOrderCost() {
     const actualCosts = document.querySelectorAll(".order_activity_type_list.active .order_activity_type .order_activity_type_actual_cost .currency") // Select all Actual Cost values from the Active Order Activity Type List
     
     const costNumbers = Array.from(costs).map(node => {
-        const text = node.textContent.replace('Php', '').trim()
-        return parseFloat(text)
+        const text = node.textContent.trim()
+        return parseFloat(text) || 0
     }) // Convert the costs NodeList to an array of floats
     
     const actualCostNumbers = Array.from(actualCosts).map(node => {
-        const text = node.textContent.replace('Php', '').trim()
-        return parseFloat(text)
+        const text = node.textContent.trim()
+        return parseFloat(text) || 0
     }) // Convert the actual costs NodeList to an array of floats
     
     // Initialize cost variables
